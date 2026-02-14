@@ -7,10 +7,16 @@
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Prism CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Iris CSS -->
     <link rel="stylesheet" href="iris.css">
+
+
+
+
     
     <style>
         body {
@@ -75,7 +81,7 @@
                     </h1>
                     <p class="lead mb-4">Powerful and flexible library for creating Bootstrap 5 modal dialogs with advanced features</p>
                     <div>
-                        <span class="info-badge"><i class="bi bi-code-slash"></i> v1.0.1</span>
+                        <span class="info-badge"><i class="bi bi-code-slash"></i> v1.0.2</span>
                         <span class="info-badge"><i class="bi bi-calendar"></i> 2025-02-14</span>
                         <span class="info-badge"><i class="bi bi-person"></i> Igor Lovrić</span>
                         <span class="info-badge"><i class="bi bi-file-earmark-text"></i> MIT License</span>
@@ -124,7 +130,9 @@
                                 <i class="bi bi-play-fill"></i> Run Example
                             </button>
                             <div class="code-block mt-3">
+<pre><code class="language-javascript">
 Iris.alert('This is an informative message!');
+</code></pre>
                             </div>
                         </div>
                     </div>
@@ -140,10 +148,14 @@ Iris.alert('This is an informative message!');
                                 <i class="bi bi-play-fill"></i> Run Example
                             </button>
                             <div class="code-block mt-3">
-Iris.confirm('Are you sure?')
+<pre><code class="language-javascript">
+Iris.confirm('Are you sure you want to continue?')
     .then(result => {
-        console.log(result); // true or false
-    });
+        if (result) Iris.success('You confirmed!');
+        else Iris.alert('You cancelled.');
+    }
+);
+</code></pre>
                             </div>
                         </div>
                     </div>
@@ -159,7 +171,9 @@ Iris.confirm('Are you sure?')
                                 <i class="bi bi-play-fill"></i> Run Example
                             </button>
                             <div class="code-block mt-3">
+<pre><code class="language-javascript">
 Iris.success('Operation completed successfully!');
+</code></pre>
                             </div>
                         </div>
                     </div>
@@ -175,7 +189,9 @@ Iris.success('Operation completed successfully!');
                                 <i class="bi bi-play-fill"></i> Run Example
                             </button>
                             <div class="code-block mt-3">
+<pre><code class="language-javascript">
 Iris.error('An error occurred during processing!');
+</code></pre>
                             </div>
                         </div>
                     </div>
@@ -191,10 +207,11 @@ Iris.error('An error occurred during processing!');
                                 <i class="bi bi-play-fill"></i> Run Example
                             </button>
                             <div class="code-block mt-3">
-Iris.prompt('Enter your name:', 'Name', 'User')
-    .then(value => {
-        if (value) alert('Entered: ' + value);
-    });
+<pre><code class="language-javascript">
+Iris.prompt('Enter your name:', 'Name Input', 'User').then(value => {
+    if (value !== null) Iris.success('Hello, ' + value + '!');
+});
+</code></pre>
                             </div>
                         </div>
                     </div>
@@ -210,7 +227,9 @@ Iris.prompt('Enter your name:', 'Name', 'User')
                                 <i class="bi bi-play-fill"></i> Run Example
                             </button>
                             <div class="code-block mt-3">
+<pre><code class="language-javascript">
 Iris.warning('Attention! This action cannot be undone.');
+</code></pre>
                             </div>
                         </div>
                     </div>
@@ -249,6 +268,7 @@ Iris.warning('Attention! This action cannot be undone.');
                             </button>
                             
                             <div class="code-block mt-3">
+<pre><code class="language-javascript">
 // Small size
 Iris.show({ title: 'Small dialog', size: Iris.SIZE_SMALL });
 
@@ -266,6 +286,7 @@ Iris.show({ title: 'Full width', size: Iris.SIZE_FULLWIDTH });
 
 // Fullscreen
 Iris.show({ title: 'Fullscreen', size: Iris.SIZE_FULLSCREEN });
+</code></pre>
                             </div>
                         </div>
                     </div>
@@ -306,11 +327,13 @@ Iris.show({ title: 'Fullscreen', size: Iris.SIZE_FULLSCREEN });
                             </button>
                             
                             <div class="code-block mt-3">
+<pre><code class="language-javascript">
 Iris.show({
     title: 'Primary style',
     type: Iris.TYPE_PRIMARY,
-    message: 'The header is blue'
+    message: 'Blue header for primary actions.'
 });
+</code></pre>
                             </div>
                         </div>
                     </div>
@@ -333,20 +356,37 @@ Iris.show({
                                 <i class="bi bi-play-fill"></i> Run Example
                             </button>
                             <div class="code-block mt-3">
+<pre><code class="language-javascript">
 Iris.show({
     title: 'Choose Action',
-    message: 'What would you like to do?',
+    message: '<p>What would you like to do with this document?</p>',
+    type: Iris.TYPE_INFO,
     buttons: [
         {
             label: 'Save',
             cssClass: 'btn-success',
             icon: 'bi bi-save',
-            action: (dialog) => {
-                console.log('Saved!');
-            }
+            action: () => Iris.success('Document saved!')
+        },
+        {
+            label: 'Print',
+            cssClass: 'btn-primary',
+            icon: 'bi bi-printer',
+            action: () => Iris.alert('Sending to printer...')
+        },
+        {
+            label: 'Delete',
+            cssClass: 'btn-danger',
+            icon: 'bi bi-trash',
+            action: () => Iris.warning('Document deleted!')
+        },
+        {
+            label: 'Cancel',
+            cssClass: 'btn-secondary'
         }
     ]
 });
+</code></pre>
                             </div>
                         </div>
                     </div>
@@ -362,11 +402,13 @@ Iris.show({
                                 <i class="bi bi-play-fill"></i> Run Example
                             </button>
                             <div class="code-block mt-3">
+<pre><code class="language-javascript">
 Iris.show({
     title: 'Draggable Dialog',
-    message: 'Grab the header and move me!',
+    message: '<p><i class="bi bi-arrows-move"></i> Grab the header and move me anywhere on the screen!</p><p>This feature is useful when you want to see content behind the dialog.</p>',
     draggable: true
 });
+</code></pre>
                             </div>
                         </div>
                     </div>
@@ -382,11 +424,14 @@ Iris.show({
                                 <i class="bi bi-play-fill"></i> Run Example
                             </button>
                             <div class="code-block mt-3">
+<pre><code class="language-javascript">
 Iris.show({
     title: 'Centered Dialog',
-    message: 'This dialog is vertically centered',
-    centered: true
+    message: '<p>This dialog is vertically centered on the screen.</p><p>Ideal for focusing user attention.</p>',
+    centered: true,
+    type: Iris.TYPE_PRIMARY
 });
+</code></pre>
                             </div>
                         </div>
                     </div>
@@ -402,6 +447,7 @@ Iris.show({
                                 <i class="bi bi-play-fill"></i> Run Example
                             </button>
                             <div class="code-block mt-3">
+<pre><code class="language-javascript">
 Iris.show({
     title: 'Loading from Server',
     ajaxUrl: 'content.html',
@@ -409,6 +455,7 @@ Iris.show({
         console.log('Content loaded!');
     }
 });
+</code></pre>
                             </div>
                         </div>
                     </div>
@@ -424,15 +471,21 @@ Iris.show({
                                 <i class="bi bi-play-fill"></i> Run Example
                             </button>
                             <div class="code-block mt-3">
-const dialog = new Iris();
-dialog.show({
-    title: 'Registration',
+<pre><code class="language-javascript">
+Iris.show({
+    title: 'Registration Form',
     message: '<form>...</form>',
-    buttons: [{
-        label: 'Submit',
-        action: (d) => { /* validate */ }
-    }]
+    buttons: [
+        { label: 'Cancel', cssClass: 'btn-secondary' },
+        {
+            label: 'Register',
+            cssClass: 'btn-primary',
+            icon: 'bi bi-person-plus',
+            action: (d) => { /* validate */ }
+        }
+    ]
 });
+</code></pre>
                             </div>
                         </div>
                     </div>
@@ -448,12 +501,17 @@ dialog.show({
                                 <i class="bi bi-play-fill"></i> Run Example
                             </button>
                             <div class="code-block mt-3">
+<pre><code class="language-javascript">
 Iris.show({
-    onshow: (d) => console.log('Before show'),
-    onshown: (d) => console.log('Shown!'),
-    onhide: (d) => { return true; },
-    onhidden: (d) => console.log('Closed!')
+    title: 'Dialog with Callbacks',
+    message: '<p>Open Developer Console (F12) to see messages!</p>',
+    type: Iris.TYPE_INFO,
+    onshow: () => console.log('🔵 onshow: Dialog will be shown'),
+    onshown: () => console.log('🟢 onshown: Dialog is shown'),
+    onhide: () => { console.log('🟡 onhide: Dialog will be closed'); return true; },
+    onhidden: () => console.log('🔴 onhidden: Dialog is closed')
 });
+</code></pre>
                             </div>
                         </div>
                     </div>
@@ -475,11 +533,26 @@ Iris.show({
                                 <i class="bi bi-play-fill"></i> Run Example
                             </button>
                             <div class="code-block mt-3">
-const dialog = new Iris();
-dialog.show({ title: 'Original' });
-dialog.setContent('New content!');
-dialog.setTitle('New title');
-dialog.addButton({ label: 'New' });
+<pre><code class="language-javascript">
+Iris.show({
+    title: 'Original Title',
+    message: 'Original content',
+    buttons: [
+        {
+            label: 'Update',
+            cssClass: 'btn-primary',
+            id: 'btnUpdate',
+            action: (d) => {
+                d.setContent('<div class="alert alert-success">Content updated!</div>');
+                d.setTitle('New Title');
+                d.disableButton('btnUpdate');
+                return false;
+            }
+        },
+        { label: 'Close', cssClass: 'btn-secondary' }
+    ]
+});
+</code></pre>
                             </div>
                         </div>
                     </div>
@@ -494,12 +567,33 @@ dialog.addButton({ label: 'New' });
                                 <i class="bi bi-play-fill"></i> Run Example
                             </button>
                             <div class="code-block mt-3">
-const dialog = new Iris();
-dialog.show({
-    title: 'Loading...',
-    message: '<div class="progress">...</div>'
+<pre><code class="language-javascript">
+let dialog=Iris.show({
+    title: 'Loading File...',
+    message: `<div class="progress" style="height: 30px;"><div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%; font-size: 16px;">0%</div></div><p class="text-center mt-3">Please wait...</p>`,
+    type: Iris.TYPE_INFO,
+    closeButton: false,
+    keyboard: false,
+    backdrop: 'static'
 });
-// Update progress bar dynamically
+
+let progress = 0;
+const interval = setInterval(() => {
+    progress += 10;
+    const bar = document.getElementById('progressBar');
+    if (bar) {
+        bar.style.width = progress + '%';
+        bar.textContent = progress + '%';
+    }
+    if (progress >= 100) {
+        clearInterval(interval);
+        setTimeout(() => {
+            dialog.close();
+            Iris.success('File loaded successfully!');
+        }, 500);
+    }
+}, 400);
+</code></pre>
                             </div>
                         </div>
                     </div>
@@ -528,17 +622,19 @@ dialog.show({
                             </button>
                             
                             <div class="code-block mt-3">
-// Add new language
-Iris.i18n['de-DE'] = {
-    name: 'Deutsch',
-    translations: { ok: 'OK', cancel: 'Abbrechen' }
-};
-
-// Set language
+<pre><code class="language-javascript">
+if (!Iris.i18n['de-DE']) {
+    Iris.i18n['de-DE'] = {
+        name: 'Deutsch',
+        translations: { ok: 'OK', cancel: 'Abbrechen', yes: 'Ja', no: 'Nein', close: 'Schließen', confirm: 'Bestätigen', info: 'Information', success: 'Erfolg', warning: 'Warnung', error: 'Fehler' }
+    };
+}
 Iris.setLanguage('de-DE');
-
-// Use it
-Iris.alert('Hallo Welt!');
+Iris.confirm('Möchten Sie fortfahren?').then(result => {
+    if (result) Iris.success('Sie haben bestätigt!');
+    Iris.setLanguage('en-US');
+});
+</code></pre>
                             </div>
                         </div>
                     </div>
@@ -555,18 +651,23 @@ Iris.alert('Hallo Welt!');
                     
                     <h6 class="mt-4">1. Include Bootstrap 5</h6>
                     <div class="code-block">
+<pre><code class="language-javascript">
 &lt;link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"&gt;
 &lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
+</code></pre>
                     </div>
 
                     <h6 class="mt-4">2. Include Iris Files</h6>
                     <div class="code-block">
+<pre><code class="language-javascript">
 &lt;link rel="stylesheet" href="iris.css"&gt;
 &lt;script src="iris.js"&gt;&lt;/script&gt;
+</code></pre>
                     </div>
 
                     <h6 class="mt-4">3. Use Iris</h6>
                     <div class="code-block">
+<pre><code class="language-javascript">
 // Simple
 Iris.alert('Hello World!');
 
@@ -579,6 +680,7 @@ dialog.show({
     type: Iris.TYPE_PRIMARY,
     buttons: [{ label: 'OK', cssClass: 'btn-primary' }]
 });
+</code></pre>
                     </div>
                 </div>
             </div>
@@ -598,6 +700,9 @@ dialog.show({
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Prism JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
     <!-- Iris JS -->
     <script src="iris.js"></script>
     <!-- Iris i18n (optional) -->
@@ -612,13 +717,15 @@ dialog.show({
 
         // Basic Examples
         function demoAlert() {
+            Iris.setLanguage('en-US');
             Iris.alert('This is an informative message!', 'Information');
         }
 
         function demoConfirm() {
+            Iris.setLanguage('en-US');
             Iris.confirm('Are you sure you want to continue?').then(result => {
                 if (result) Iris.success('You confirmed!');
-                else Iris.info('You cancelled.');
+                else Iris.alert('You cancelled.');
             });
         }
 
@@ -642,7 +749,7 @@ dialog.show({
 
         // Size Examples
         function demoSizeSmall() {
-            Iris.show({ title: 'Small Dialog', message: 'This is a small dialog ideal for short messages.', size: Iris.SIZE_SMALL });
+            Iris.show({ title: 'Small Dialog', message: 'This is a small dialog ideal for short messages.', size: Iris.SIZE_SMALL});
         }
 
         function demoSizeNormal() {
@@ -702,7 +809,7 @@ dialog.show({
                 type: Iris.TYPE_INFO,
                 buttons: [
                     { label: 'Save', cssClass: 'btn-success', icon: 'bi bi-save', action: () => Iris.success('Document saved!') },
-                    { label: 'Print', cssClass: 'btn-primary', icon: 'bi bi-printer', action: () => Iris.info('Sending to printer...') },
+                    { label: 'Print', cssClass: 'btn-primary', icon: 'bi bi-printer', action: () => Iris.alert('Sending to printer...') },
                     { label: 'Delete', cssClass: 'btn-danger', icon: 'bi bi-trash', action: () => Iris.warning('Document deleted!') },
                     { label: 'Cancel', cssClass: 'btn-secondary' }
                 ]
@@ -713,8 +820,7 @@ dialog.show({
             Iris.show({
                 title: 'Draggable Dialog',
                 message: '<p><i class="bi bi-arrows-move"></i> Grab the header and move me anywhere on the screen!</p><p>This feature is useful when you want to see content behind the dialog.</p>',
-                draggable: true,
-                type: Iris.TYPE_INFO
+                draggable: true
             });
         }
 
@@ -729,13 +835,10 @@ dialog.show({
 
         function demoAjax() {
             Iris.show({
-                title: 'AJAX Loading',
-                message: '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-3">Simulating server loading...</p></div>',
-                type: Iris.TYPE_INFO,
-                onshown: (dialog) => {
-                    setTimeout(() => {
-                        dialog.setContent(`<div class="alert alert-success"><i class="bi bi-check-circle"></i> Content loaded successfully!</div><p>This is content that would be loaded from the server.</p><ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>`);
-                    }, 2000);
+                title: 'Loading from Server',
+                ajaxUrl: 'content.html',
+                onContentLoaded: (dialog) => {
+                    console.log('Content loaded!');
                 }
             });
         }
@@ -782,11 +885,9 @@ dialog.show({
         }
 
         function demoUpdateContent() {
-            const dialog = new Iris();
-            dialog.show({
+            Iris.show({
                 title: 'Original Title',
                 message: 'Original content',
-                type: Iris.TYPE_INFO,
                 buttons: [
                     {
                         label: 'Update',
@@ -799,22 +900,14 @@ dialog.show({
                             return false;
                         }
                     },
-                    {
-                        label: 'Add Button',
-                        cssClass: 'btn-info',
-                        action: (d) => {
-                            d.addButton({ label: 'New Button', cssClass: 'btn-success', icon: 'bi bi-star', action: () => Iris.success('You clicked the new button!') });
-                            return false;
-                        }
-                    },
                     { label: 'Close', cssClass: 'btn-secondary' }
                 ]
             });
         }
 
         function demoProgress() {
-            const dialog = new Iris();
-            dialog.show({
+
+            let dialog=Iris.show({
                 title: 'Loading File...',
                 message: `<div class="progress" style="height: 30px;"><div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%; font-size: 16px;">0%</div></div><p class="text-center mt-3">Please wait...</p>`,
                 type: Iris.TYPE_INFO,
@@ -872,7 +965,7 @@ dialog.show({
         }
 
         // Console info
-        console.log('%c🌸 Iris Modal Library v1.0.1', 'font-size: 20px; color: #667eea; font-weight: bold;');
+        console.log('%c🌸 Iris Modal Library v1.0.2', 'font-size: 20px; color: #667eea; font-weight: bold;');
         console.log('Made with ❤️ by Igor Lovrić');
         console.log('Try the examples on the page!');
     </script>
