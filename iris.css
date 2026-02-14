@@ -1,0 +1,3 @@
+.modal .modal-fullwidth {
+    --bs-modal-width: calc(100vw - 60px);
+}

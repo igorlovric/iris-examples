@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <div class="alert alert-success">
+        <i class="bi bi-check-circle"></i> <strong>Successfully loaded!</strong>
+    </div>
+    
+    <h5>Dynamically Loaded Content</h5>
+    <p>This content was loaded via AJAX request.</p>
+    
+    <div class="card mb-3">
+        <div class="card-body">
+            <h6 class="card-title">Example Data</h6>
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Item A</td>
+                        <td><span class="badge bg-success">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Item B</td>
+                        <td><span class="badge bg-warning">Pending</span></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Item C</td>
+                        <td><span class="badge bg-danger">Inactive</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <p><small class="text-muted">Loaded: <span id="loadTime"></span></small></p>
+    
+    <script>
+        document.getElementById('loadTime').textContent = new Date().toLocaleString('en-US');
+    </script>
+</body>
+</html>
