@@ -5,7 +5,7 @@ class Iris {
      */
     static info = {
         name: 'Iris',
-        version: '1.0.5',
+        version: '1.0.6',
         date: '2025-02-15',
         author: 'Igor Lovrić',
         license: 'MIT'
@@ -42,6 +42,7 @@ class Iris {
         }
     };
 
+
     // Type constants (dialog size)
     static SIZE_SMALL = 'modal-sm';
     static SIZE_NORMAL = '';
@@ -63,6 +64,7 @@ class Iris {
         backdrop: true,
         keyboard: true,
         closeOnBackdrop: true,
+        spinIcon : 'spinner-border spinner-border-sm',
         size: Iris.SIZE_NORMAL,
         type: Iris.TYPE_DEFAULT
     };
@@ -208,16 +210,28 @@ class Iris {
     renderButtons() {
         if (!this.options.buttons || this.options.buttons.length === 0) return '';
 
-        return this.options.buttons.map(btn => {
+        return this.options.buttons.map((btn, index) => {
             const btnId = btn.id?btn.id:'btn_' + Math.random().toString(36).substr(2, 9);
             const icon=btn.icon?`<i class="${btn.icon}"></i> `:'';
+
+            this._buttonRefs = this._buttonRefs || [];
+            this._buttonRefs[index] = { id: btnId, config: btn };
 
             setTimeout(() => {
                 const buttonElement = document.getElementById(btnId);
                 if (buttonElement) {
+                    buttonElement._originalHTML = buttonElement.innerHTML;
+                    buttonElement._isSpinning = false;
+
                     buttonElement.addEventListener('click', (e) => {
                         if (btn.action) {
+                            if (btn.autoSpin) {
+                                this.buttonSpin(index, true);
+                            }
                             const result = btn.action(this, e);
+                            if (result !== false && btn.autoClose !== false && btn.autoSpin) {
+                                this.buttonSpin(index, false);
+                            }
                             if (result !== false && btn.autoClose !== false) {
                                 this.close();
                             }
@@ -675,6 +689,130 @@ class Iris {
         });
     }
 
+    /**
+     * Starts or stops a spinner animation on a button
+     *
+     * @param {number|string} identifier - Button index (0-based), button ID, or button label
+     * @param {boolean} spin - If true, starts spinner. If false, stops spinner and restores original content.
+     *
+     * @example
+     * // Start spinner on first button
+     * dialog.buttonSpin(0, true);
+     *
+     * @example
+     * // Stop spinner on first button
+     * dialog.buttonSpin(0, false);
+     *
+     * @example
+     * // By button ID
+     * dialog.buttonSpin('btn_save', true);
+     *
+     * @example
+     * // By button label
+     * dialog.buttonSpin('Save', true);
+     *
+     * @example
+     * // Common use case with AJAX
+     * buttons: [{
+     *     label: 'Save',
+     *     cssClass: 'btn-primary',
+     *     action: function(dialogRef) {
+     *         dialogRef.buttonSpin(0, true);
+     *
+     *         fetch('/api/save')
+     *             .then(() => {
+     *                 dialogRef.buttonSpin(0, false);
+     *                 dialogRef.close();
+     *             })
+     *             .catch(() => {
+     *                 dialogRef.buttonSpin(0, false);
+     *             });
+     *
+     *         return false;
+     *     }
+     * }]
+     */
+    buttonSpin(identifier, spin) {
+        const footer = this.getModalFooter();
+        if (!footer) return;
+
+        let button = null;
+
+        // Find button by index, ID, or label
+        if (typeof identifier === 'number') {
+            const buttons = footer.querySelectorAll('button');
+            button = buttons[identifier];
+        }
+        else if (typeof identifier === 'string') {
+            const id = identifier.startsWith('#') ? identifier.slice(1) : identifier;
+            button = footer.querySelector(`#${id}`);
+
+            if (!button) {
+                const buttons = footer.querySelectorAll('button');
+                button = Array.from(buttons).find(btn => btn.textContent.trim() === identifier);
+            }
+        }
+
+        if (!button) return;
+
+        // Initialize original HTML if not already stored
+        if (!button._originalHTML) {
+            button._originalHTML = button.innerHTML;
+            button._isSpinning = false;
+        }
+
+        if (spin) {
+            // Start spinning
+            if (!button._isSpinning) {
+                button._isSpinning = true;
+                button.disabled = true;
+
+                const spinnerClass = this.options.spinIcon || 'spinner-border spinner-border-sm';
+                const spinnerHTML = `<span class="${spinnerClass}" role="status" aria-hidden="true"></span>`;
+
+                // Check if button has an icon already
+                const icon = button.querySelector('i, svg, .icon');
+                if (icon) {
+                    // Replace existing icon with spinner
+                    button._originalIcon = icon.outerHTML;
+                    icon.outerHTML = spinnerHTML;
+                } else {
+                    // Prepend spinner before text
+                    button.innerHTML = `${spinnerHTML} ${button.textContent.trim()}`;
+                }
+            }
+        } else {
+            // Stop spinning
+            if (button._isSpinning) {
+                button._isSpinning = false;
+                button.disabled = false;
+                button.innerHTML = button._originalHTML;
+            }
+        }
+    }
+
+    /**
+     * Starts or stops spinner on all buttons
+     *
+     * @param {boolean} spin - If true, starts spinner on all buttons. If false, stops all spinners.
+     *
+     * @example
+     * // Start spinner on all buttons
+     * dialog.buttonSpinAll(true);
+     *
+     * @example
+     * // Stop spinner on all buttons
+     * dialog.buttonSpinAll(false);
+     */
+    buttonSpinAll(spin) {
+        const footer = this.getModalFooter();
+        if (!footer) return;
+
+        const buttons = footer.querySelectorAll('button');
+        buttons.forEach((button, index) => {
+            this.buttonSpin(index, spin);
+        });
+    }
 
     /**
      * Enables or disables the ability to close the dialog
