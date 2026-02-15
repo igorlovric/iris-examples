@@ -5,19 +5,42 @@ class Iris {
      */
     static info = {
         name: 'Iris',
-        version: '1.0.2',
-        date: '2025-02-14',
+        version: '1.0.3',
+        date: '2025-02-15',
         author: 'Igor Lovrić',
         license: 'MIT'
     };
-
 
     static instances = [];
     static baseZIndex = 1050;
 
     // Multilanguage support
     static currentLanguage = 'en-US'; // Default language
-    static i18n = {};
+    static i18n = {
+        'en-US': {
+            code: 'en-US',
+            name: 'English (United States)',
+            translations: {
+                loading: 'Loading...',
+                close: 'Close',
+                cancel: 'Cancel',
+                ok: 'OK',
+                yes: 'Yes',
+                no: 'No',
+                confirm: 'Confirm',
+                prompt: 'Enter Value',
+                delete: 'Delete',
+                save: 'Save',
+                error: 'Error',
+                warning: 'Warning',
+                success: 'Success',
+                info: 'Information',
+                loadError: 'Error loading content: {0}',
+                confirmDelete: 'Are you sure you want to delete this item?',
+                confirmAction: 'Are you sure you want to proceed?'
+            }
+        }
+    };
 
     // Type constants (dialog size)
     static SIZE_SMALL = 'modal-sm';
