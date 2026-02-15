@@ -36,6 +36,8 @@ class Iris {
                 success: 'Success',
                 info: 'Information',
                 loadError: 'Error loading content: {0}',
+                minimizedDialogs: 'Minimized Dialogs',
+                noMinimizedDialogs: 'No minimized dialogs',
                 confirmDelete: 'Are you sure you want to delete this item?',
                 confirmAction: 'Are you sure you want to proceed?'
             }
@@ -60,10 +62,20 @@ class Iris {
     static TYPE_DANGER = 'danger';
     static TYPE_DARK = 'dark';
 
+    // Taskbar configuration
+    static taskbarPosition = 'bottom-right';  // bottom-right, bottom-left, top-right, top-left
+    static taskbarOffset = 20;                // Distance from edge in pixels
+    static taskbarZIndex = 999999;            // Very high z-index
+    static taskbarButtonColor = '#6c757d';    // Bootstrap secondary color (pastel gray)
+    static taskbarMaxHeight = 300;            // Maximum height of minimized dialogs list
+    static taskbarButtonSize = 60;            // Size of floating button
+
     static defaults = {
         backdrop: true,
         keyboard: true,
         closeOnBackdrop: true,
+        draggable: false,
+        minimizable: false,
         spinIcon : 'spinner-border spinner-border-sm',
         size: Iris.SIZE_NORMAL,
         type: Iris.TYPE_DEFAULT
@@ -155,10 +167,17 @@ class Iris {
     }
 
     createModal() {
-        const modalId = 'dynamicModal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        const modalId = 'irisModal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+        // Minimize button (if enabled)
+        const minimizeButton = this.options.minimizable ?
+            '<button type="button" class="btn-minimize" aria-label="Minimize"><span>−</span></button>' : '';
+
+        // Close button
         const closeButton = this.options.closeButton !== false ?
             `<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${Iris.t('close')}"></button>` : '';
 
+        // Select CSS class for type
         const headerClass = this.getHeaderClass();
         const textClass = this.getHeaderTextClass();
 
@@ -169,7 +188,10 @@ class Iris {
                         ${this.options.title ? `
                         <div class="modal-header ${headerClass}">
                             <h5 class="modal-title ${textClass}">${this.options.title}</h5>
-                            ${closeButton}
+                            <div class="modal-header-buttons">
+                                ${minimizeButton}
+                                ${closeButton}
+                            </div>
                         </div>` : ''}
                         <div class="modal-body">
                             ${this.options.message || `<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">${Iris.t('loading')}</span></div></div>`}
@@ -185,6 +207,14 @@ class Iris {
 
         document.body.insertAdjacentHTML('beforeend', html);
         this.modalElement = document.getElementById(modalId);
+
+        // Minimize button event listener
+        if (this.options.minimizable) {
+            const minimizeBtn = this.modalElement.querySelector('.btn-minimize');
+            if (minimizeBtn) {
+                minimizeBtn.addEventListener('click', () => this.minimize());
+            }
+        }
     }
 
     getHeaderClass() {
@@ -401,6 +431,12 @@ class Iris {
     }
 
     destroy() {
+
+        // Remove from taskbar if minimized
+        if (this._isMinimized) {
+            IrisTaskbar.remove(this);
+        }
+
         if (this.modalElement) {
             this.modalElement.remove();
         }
@@ -960,6 +996,170 @@ class Iris {
         return dialog;
     }
 
+
+    /**
+     * Minimizes the dialog
+     * Hides the dialog and adds it to the taskbar. The dialog state is preserved.
+     *
+     * @example
+     * dialog.minimize();
+     */
+    minimize() {
+        if (!this.options.minimizable) return;
+        if (this._isMinimized) return;
+
+        // Check if there's a modal above this one
+        const allModals = document.querySelectorAll('.modal.show');
+        const thisModalIndex = Array.from(allModals).indexOf(this.modalElement);
+        if (thisModalIndex < allModals.length - 1) {
+            console.warn('Cannot minimize: there are other dialogs above this one');
+            return;
+        }
+
+        // Save current state
+        this._minimizedState = {
+            scrollTop: this.getModalBody().scrollTop,
+            wasVisible: this.modalElement.classList.contains('show')
+        };
+
+        // If draggable, save position
+        if (this.options.draggable) {
+            const dialog = this.modalElement.querySelector('.modal-dialog');
+            this._minimizedState.position = {
+                left: dialog.style.left,
+                top: dialog.style.top,
+                transform: dialog.style.transform
+            };
+        }
+
+        // Hide modal manually
+        this.modalElement.classList.remove('show');
+        this.modalElement.style.display = 'none';
+        this.modalElement.setAttribute('aria-hidden', 'true');
+
+        // Find THIS modal's backdrop (the one right after this modal in DOM)
+        let backdrop = this.modalElement.nextElementSibling;
+        while (backdrop && !backdrop.classList.contains('modal-backdrop')) {
+            backdrop = backdrop.nextElementSibling;
+        }
+
+        // Save backdrop reference for restore
+        this._minimizedState.backdrop = backdrop;
+
+        // Hide this modal's backdrop
+        if (backdrop) {
+            backdrop.classList.remove('show');
+            setTimeout(() => {
+                if (backdrop && this._isMinimized) {
+                    backdrop.style.display = 'none';
+                }
+            }, 150);
+        }
+
+        // Check if there are other visible modals or minimized dialogs
+        const visibleModals = document.querySelectorAll('.modal.show');
+        const hasMinimizedDialogs = IrisTaskbar.minimizedDialogs.length > 0;
+
+        // Only remove modal-open if no modals are visible AND no dialogs are minimized
+        if (visibleModals.length === 0 && !hasMinimizedDialogs) {
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        }
+
+        this._isMinimized = true;
+
+        // Add to taskbar
+        IrisTaskbar.add(this);
+
+        // Fire event
+        if (this.options.onminimize) {
+            this.options.onminimize(this);
+        }
+    }
+
+    /**
+     * Restores a minimized dialog
+     * Shows the dialog again and restores its previous state.
+     *
+     * @example
+     * dialog.restore();
+     */
+    restore() {
+        if (!this._isMinimized) return;
+
+        // Remove from taskbar first
+        IrisTaskbar.remove(this);
+
+        // Restore modal manually
+        this.modalElement.style.display = 'block';
+        this.modalElement.classList.add('show');
+        this.modalElement.setAttribute('aria-hidden', 'false');
+
+        // Restore THIS modal's backdrop
+        let backdrop = this._minimizedState?.backdrop;
+
+        if (backdrop) {
+            // Use existing backdrop
+            backdrop.style.display = '';
+            setTimeout(() => {
+                backdrop.classList.add('show');
+            }, 10);
+        } else {
+            // Create new backdrop if it doesn't exist
+            backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade';
+
+            // Insert backdrop right after this modal
+            this.modalElement.parentNode.insertBefore(backdrop, this.modalElement.nextSibling);
+
+            setTimeout(() => {
+                backdrop.classList.add('show');
+            }, 10);
+        }
+
+        backdrop.style.zIndex = this.zIndex - 1;
+
+        // Restore body modal state
+        document.body.classList.add('modal-open');
+
+        // Restore z-index
+        this.modalElement.style.zIndex = this.zIndex;
+
+        this._isMinimized = false;
+
+        // Restore state
+        if (this._minimizedState) {
+            // Restore scroll position
+            this.getModalBody().scrollTop = this._minimizedState.scrollTop;
+
+            // Restore position if draggable
+            if (this.options.draggable && this._minimizedState.position) {
+                const dialog = this.modalElement.querySelector('.modal-dialog');
+                dialog.style.left = this._minimizedState.position.left;
+                dialog.style.top = this._minimizedState.position.top;
+                dialog.style.transform = this._minimizedState.position.transform;
+            }
+
+            delete this._minimizedState;
+        }
+
+        // Fire event
+        if (this.options.onrestore) {
+            this.options.onrestore(this);
+        }
+    }
+
+
+    /**
+     * Check if dialog is minimized
+     *
+     * @returns {boolean}
+     */
+    isMinimized() {
+        return this._isMinimized === true;
+    }
+
     static alert(message, title = Iris.t('info'), options = {}) {
         return Iris.show({
             title: title,
@@ -1083,5 +1283,350 @@ class Iris {
             ],
             ...options
         });
+    }
+}
+
+/**
+ * IrisTaskbar - Manages minimized dialogs
+ * @private
+ */
+class IrisTaskbar {
+    static minimizedDialogs = [];
+    static taskbarElement = null;
+    static listElement = null;
+    static isListVisible = false;
+
+    /**
+     * Initialize taskbar if needed
+     * @private
+     */
+    static init() {
+        if (!this.taskbarElement) {
+            this.create();
+        }
+    }
+
+    /**
+     * Create taskbar button and list
+     * @private
+     */
+    static create() {
+        // Create taskbar container
+        this.taskbarElement = document.createElement('div');
+        this.taskbarElement.id = 'irisTaskbar';
+        this.taskbarElement.style.display = 'none'; // Hidden by default
+        this.taskbarElement.style.zIndex = Iris.taskbarZIndex;
+
+        // Set position based on Iris.taskbarPosition
+        this.setPosition();
+
+        // Create button
+        const button = document.createElement('button');
+        button.id = 'irisTaskbarButton';
+        button.style.backgroundColor = Iris.taskbarButtonColor;
+        button.innerHTML = `
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" rx="1"/>
+                <rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="14" y="14" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/>
+            </svg>
+            <span class="iris-taskbar-badge" style="display: none;">0</span>
+        `;
+
+        button.addEventListener('click', () => this.toggle());
+
+        this.taskbarElement.appendChild(button);
+        document.body.appendChild(this.taskbarElement);
+    }
+
+    /**
+     * Set taskbar position based on Iris.taskbarPosition
+     * @private
+     */
+    static setPosition() {
+        if (!this.taskbarElement) return;
+
+        const offset = Iris.taskbarOffset + 'px';
+        const zIndex = Iris.taskbarZIndex;
+
+        this.taskbarElement.style.zIndex = zIndex;
+
+        // Reset all positions
+        this.taskbarElement.style.top = 'auto';
+        this.taskbarElement.style.bottom = 'auto';
+        this.taskbarElement.style.left = 'auto';
+        this.taskbarElement.style.right = 'auto';
+
+        switch (Iris.taskbarPosition) {
+            case 'bottom-right':
+                this.taskbarElement.style.bottom = offset;
+                this.taskbarElement.style.right = offset;
+                break;
+            case 'bottom-left':
+                this.taskbarElement.style.bottom = offset;
+                this.taskbarElement.style.left = offset;
+                break;
+            case 'top-right':
+                this.taskbarElement.style.top = offset;
+                this.taskbarElement.style.right = offset;
+                break;
+            case 'top-left':
+                this.taskbarElement.style.top = offset;
+                this.taskbarElement.style.left = offset;
+                break;
+        }
+    }
+
+    /**
+     * Add dialog to taskbar
+     * @param {Iris} dialog
+     */
+    static add(dialog) {
+        this.init();
+
+        if (!this.minimizedDialogs.includes(dialog)) {
+            this.minimizedDialogs.push(dialog);
+            this.updateBadge();
+            this.show();
+        }
+    }
+
+    /**
+     * Remove dialog from taskbar
+     * @param {Iris} dialog
+     */
+    static remove(dialog) {
+        const index = this.minimizedDialogs.indexOf(dialog);
+        if (index > -1) {
+            this.minimizedDialogs.splice(index, 1);
+            this.updateBadge();
+
+            if (this.minimizedDialogs.length === 0) {
+                this.hide();
+                this.hideList();
+            } else {
+                this.updateList();
+            }
+        }
+    }
+
+    /**
+     * Update badge count
+     * @private
+     */
+    static updateBadge() {
+        if (!this.taskbarElement) return;
+
+        const badge = this.taskbarElement.querySelector('.iris-taskbar-badge');
+        if (badge) {
+            badge.textContent = this.minimizedDialogs.length;
+            badge.style.display = this.minimizedDialogs.length > 0 ? 'flex' : 'none';
+        }
+    }
+
+    /**
+     * Show taskbar button
+     * @private
+     */
+    static show() {
+        if (this.taskbarElement) {
+            this.taskbarElement.style.display = 'block';
+        }
+    }
+
+    /**
+     * Hide taskbar button
+     * @private
+     */
+    static hide() {
+        if (this.taskbarElement) {
+            this.taskbarElement.style.display = 'none';
+        }
+    }
+
+    /**
+     * Toggle minimized dialogs list
+     */
+    static toggle() {
+        if (this.isListVisible) {
+            this.hideList();
+        } else {
+            this.showList();
+        }
+    }
+
+    /**
+     * Show minimized dialogs list
+     * @private
+     */
+    static showList() {
+        if (!this.listElement) {
+            this.createList();
+        }
+
+        this.updateList();
+        this.listElement.style.display = 'block';
+        this.isListVisible = true;
+
+        // Close on click outside
+        setTimeout(() => {
+            document.addEventListener('click', this._outsideClickHandler = (e) => {
+                if (!this.taskbarElement.contains(e.target)) {
+                    this.hideList();
+                }
+            });
+        }, 0);
+    }
+
+    /**
+     * Hide minimized dialogs list
+     * @private
+     */
+    static hideList() {
+        if (this.listElement) {
+            this.listElement.style.display = 'none';
+        }
+        this.isListVisible = false;
+
+        if (this._outsideClickHandler) {
+            document.removeEventListener('click', this._outsideClickHandler);
+            this._outsideClickHandler = null;
+        }
+    }
+
+    /**
+     * Create minimized dialogs list
+     * @private
+     */
+    static createList() {
+        this.listElement = document.createElement('div');
+        this.listElement.className = 'iris-taskbar-list';
+        this.listElement.style.maxHeight = Iris.taskbarMaxHeight + 'px';
+
+        // Position list based on taskbar position
+        this.positionList();
+
+        this.taskbarElement.appendChild(this.listElement);
+    }
+
+    /**
+     * Position list based on taskbar button position
+     * @private
+     */
+    static positionList() {
+        if (!this.listElement) return;
+
+        const buttonSize = Iris.taskbarButtonSize;
+
+        switch (Iris.taskbarPosition) {
+            case 'bottom-right':
+                this.listElement.style.bottom = (buttonSize + 10) + 'px';
+                this.listElement.style.right = '0';
+                break;
+            case 'bottom-left':
+                this.listElement.style.bottom = (buttonSize + 10) + 'px';
+                this.listElement.style.left = '0';
+                break;
+            case 'top-right':
+                this.listElement.style.top = (buttonSize + 10) + 'px';
+                this.listElement.style.right = '0';
+                break;
+            case 'top-left':
+                this.listElement.style.top = (buttonSize + 10) + 'px';
+                this.listElement.style.left = '0';
+                break;
+        }
+    }
+
+    /**
+     * Update minimized dialogs list content
+     * @private
+     */
+    static updateList() {
+        if (!this.listElement) return;
+
+        if (this.minimizedDialogs.length === 0) {
+            this.listElement.innerHTML = `<div class="iris-taskbar-empty">${Iris.t('noMinimizedDialogs')}</div>`;
+            return;
+        }
+
+        let html = `<div class="iris-taskbar-header"><h6>${Iris.t('minimizedDialogs')}</h6></div>`;
+
+        this.minimizedDialogs.forEach((dialog, index) => {
+            const title = dialog.options.title || 'Untitled';
+            const typeIcon = this.getTypeIcon(dialog.options.type);
+
+            html += `
+                <div class="iris-taskbar-item" data-index="${index}">
+                    <div class="iris-taskbar-item-icon">${typeIcon}</div>
+                    <div class="iris-taskbar-item-content">
+                        <p class="iris-taskbar-item-title">${title}</p>
+                    </div>
+                    <button class="iris-taskbar-item-close" data-index="${index}" data-action="close">×</button>
+                </div>
+            `;
+        });
+
+        this.listElement.innerHTML = html;
+
+        // Add event listeners
+        this.listElement.querySelectorAll('.iris-taskbar-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                // Don't restore if clicking close button
+                if (e.target.closest('.iris-taskbar-item-close')) {
+                    return;
+                }
+
+                const index = parseInt(item.dataset.index);
+                const dialog = this.minimizedDialogs[index];
+                if (dialog) {
+                    dialog.restore();
+                    this.hideList();
+                }
+            });
+        });
+
+        this.listElement.querySelectorAll('.iris-taskbar-item-close').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const index = parseInt(btn.dataset.index);
+                const dialog = this.minimizedDialogs[index];
+                if (dialog) {
+                    dialog.close(true);
+                }
+            });
+        });
+    }
+
+    /**
+     * Get icon for dialog type
+     * @private
+     */
+    static getTypeIcon(type) {
+        const icons = {
+            'primary': '📘',
+            'success': '✅',
+            'info': 'ℹ️',
+            'warning': '⚠️',
+            'danger': '❌',
+            'dark': '⬛',
+            'default': '💬'
+        };
+
+        return icons[type] || icons['default'];
+    }
+
+    /**
+     * Destroy taskbar
+     */
+    static destroy() {
+        if (this.taskbarElement) {
+            this.taskbarElement.remove();
+            this.taskbarElement = null;
+            this.listElement = null;
+        }
+        this.minimizedDialogs = [];
+        this.isListVisible = false;
     }
 }

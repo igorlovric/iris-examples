@@ -1,3 +1,214 @@
 .modal .modal-fullwidth {
     --bs-modal-width: calc(100vw - 60px);
 }
+
+/* Minimize Button */
+.modal-header-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-minimize {
+    background: transparent;
+    border: none;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 24px;
+    line-height: 1;
+    color: inherit;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.btn-minimize:hover {
+    opacity: 1;
+}
+
+.btn-minimize span {
+    display: block;
+    margin-top: -4px;
+}
+
+/* Dark background minimize button */
+.modal-header.bg-primary .btn-minimize,
+.modal-header.bg-success .btn-minimize,
+.modal-header.bg-info .btn-minimize,
+.modal-header.bg-danger .btn-minimize,
+.modal-header.bg-dark .btn-minimize {
+    color: #fff;
+}
+
+/* Light background minimize button */
+.modal-header.bg-warning .btn-minimize {
+    color: #000;
+}
+
+/* Iris Taskbar - Floating Button */
+#irisTaskbar {
+    position: fixed;
+    z-index: 999999;
+    /* Position will be set by JS based on Iris.taskbarPosition */
+}
+
+#irisTaskbarButton {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-size: 24px;
+    color: white;
+}
+
+#irisTaskbarButton:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+#irisTaskbarButton:active {
+    transform: scale(0.95);
+}
+
+.iris-taskbar-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Taskbar List */
+.iris-taskbar-list {
+    position: absolute;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+    min-width: 250px;
+    max-width: 350px;
+    overflow-y: auto;
+    /* Position will be set by JS */
+}
+
+.iris-taskbar-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.iris-taskbar-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.iris-taskbar-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.iris-taskbar-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.iris-taskbar-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.iris-taskbar-item:hover {
+    background-color: #f8f9fa;
+}
+
+.iris-taskbar-item-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.iris-taskbar-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.iris-taskbar-item-title {
+    font-weight: 500;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    color: #333;
+}
+
+.iris-taskbar-item-subtitle {
+    font-size: 12px;
+    color: #6c757d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+}
+
+.iris-taskbar-item-close {
+    background: transparent;
+    border: none;
+    padding: 4px 8px;
+    cursor: pointer;
+    color: #6c757d;
+    font-size: 18px;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.2s, color 0.2s;
+}
+
+.iris-taskbar-item:hover .iris-taskbar-item-close {
+    opacity: 1;
+}
+
+.iris-taskbar-item-close:hover {
+    color: #dc3545;
+}
+
+.iris-taskbar-header {
+    padding: 8px 12px;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 8px;
+}
+
+.iris-taskbar-header h6 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.iris-taskbar-empty {
+    padding: 20px;
+    text-align: center;
+    color: #6c757d;
+    font-size: 14px;
+}
