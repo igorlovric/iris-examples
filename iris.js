@@ -5,7 +5,7 @@ class Iris {
      */
     static info = {
         name: 'Iris',
-        version: '1.0.3',
+        version: '1.0.5',
         date: '2025-02-15',
         author: 'Igor Lovrić',
         license: 'MIT'
@@ -162,7 +162,7 @@ class Iris {
 
         const html = `
             <div class="modal fade" id="${modalId}" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog ${this.options.size} ${this.options.centered ? 'modal-dialog-centered' : ''} ${this.options.scrollable ? 'modal-dialog-scrollable' : ''}">
+                <div ${this.options.id?`id="${this.options.id}"`:''} class="modal-dialog ${this.options.size} ${this.options.centered ? 'modal-dialog-centered' : ''} ${this.options.scrollable ? 'modal-dialog-scrollable' : ''}">
                     <div class="modal-content">
                         ${this.options.title ? `
                         <div class="modal-header ${headerClass}">
@@ -642,6 +642,123 @@ class Iris {
 
         if (button) {
             button.disabled = true;
+        }
+    }
+
+    /**
+     * Enables or disables all buttons in the dialog footer
+     *
+     * @param {boolean} enable - If true, enables all buttons. If false, disables all buttons.
+     *
+     * @example
+     * // Disable all buttons
+     * dialog.enableButtons(false);
+     *
+     * @example
+     * // Enable all buttons
+     * dialog.enableButtons(true);
+     *
+     * @example
+     * // Disable during AJAX call
+     * dialog.enableButtons(false);
+     * fetch('/api/save')
+     *     .then(() => dialog.enableButtons(true))
+     *     .catch(() => dialog.enableButtons(true));
+     */
+    enableButtons(enable) {
+        const footer = this.getModalFooter();
+        if (!footer) return;
+
+        const buttons = footer.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.disabled = !enable;
+        });
+    }
+
+
+    /**
+     * Enables or disables the ability to close the dialog
+     * When set to false, disables all closing methods (backdrop, keyboard, close button, buttons).
+     * When set back to true, restores only the originally enabled closing methods.
+     *
+     * @param {boolean} closable - If true, allows closing. If false, prevents all closing methods.
+     *
+     * @example
+     * // Make dialog non-closable during processing
+     * dialog.setClosable(false);
+     *
+     * @example
+     * // Restore original closing behavior
+     * dialog.setClosable(true);
+     *
+     * @example
+     * // Typical use case: prevent closing during AJAX
+     * dialog.setClosable(false);
+     * fetch('/api/process')
+     *     .then(() => {
+     *         dialog.setClosable(true);
+     *         dialog.close();
+     *     })
+     *     .catch(() => dialog.setClosable(true));
+     */
+    setClosable(closable) {
+        if (!this.modalInstance) return;
+
+        // First time setClosable(false) is called - save original settings
+        if (!closable && this._originalClosableState === undefined) {
+            this._originalClosableState = {
+                backdrop: this.options.backdrop,
+                closeOnBackdrop: this.options.closeOnBackdrop,
+                keyboard: this.options.keyboard,
+                closeButton: this.options.closeButton
+            };
+        }
+
+        if (!closable) {
+            // Disable all closing methods
+            this.options.closeOnBackdrop = false;
+            this.options.keyboard = false;
+            this.options.closeButton = false;
+
+            // Update Bootstrap modal config
+            this.modalInstance._config.backdrop = 'static';
+            this.modalInstance._config.keyboard = false;
+
+            // Hide close button if it exists
+            const closeButton = this.modalElement.querySelector('.btn-close');
+            if (closeButton) {
+                closeButton.style.display = 'none';
+            }
+
+            // Disable all footer buttons
+            // this.enableButtons(false);
+
+        } else {
+            // Restore original settings
+            if (this._originalClosableState) {
+                this.options.closeOnBackdrop = this._originalClosableState.closeOnBackdrop;
+                this.options.keyboard = this._originalClosableState.keyboard;
+                this.options.closeButton = this._originalClosableState.closeButton;
+
+                // Update Bootstrap modal config
+                const backdropOption = this._originalClosableState.closeOnBackdrop ? true : 'static';
+                this.modalInstance._config.backdrop = this._originalClosableState.backdrop === false ? false : backdropOption;
+                this.modalInstance._config.keyboard = this._originalClosableState.keyboard;
+
+                // Show close button if it was originally enabled
+                if (this._originalClosableState.closeButton) {
+                    const closeButton = this.modalElement.querySelector('.btn-close');
+                    if (closeButton) {
+                        closeButton.style.display = '';
+                    }
+                }
+
+                // Enable all footer buttons
+                // this.enableButtons(true);
+
+                // Clear saved state
+                delete this._originalClosableState;
+            }
         }
     }
 
