@@ -1,5 +1,5 @@
 /*!
- * Iris v1.1.1
+ * Iris v1.1.2
  * Modern dialog manager for Bootstrap 5
  *
  * Homepage: https://github.com/igorlovric/iris
@@ -16,8 +16,8 @@ class Iris {
      */
     static info = {
         name: 'Iris',
-        version: '1.1.1',
-        date: '2025-02-15',
+        version: '1.1.2',
+        date: '2025-02-17',
         author: 'Igor Lovrić',
         license: 'MIT'
     };
@@ -89,7 +89,8 @@ class Iris {
         minimizable: false,
         spinIcon : 'spinner-border spinner-border-sm',
         size: Iris.SIZE_NORMAL,
-        type: Iris.TYPE_DEFAULT
+        type: Iris.TYPE_DEFAULT,
+        theme: null
     };
 
     /**
@@ -130,6 +131,10 @@ class Iris {
         };
 
         this.createModal();
+
+        if (this.options.theme) {
+            this.applyTheme(this.options.theme);
+        }
 
         if (this.options.onshow) {
             this.options.onshow(this);
@@ -1189,6 +1194,45 @@ class Iris {
      */
     isMinimized() {
         return this._isMinimized === true;
+    }
+
+    /**
+     * Applies a visual theme to the dialog
+     *
+     * @param {string} theme - Theme name (e.g. 'flat', 'dark', 'minimal')
+     *                         CSS file should be at: themes/{theme}/iris-{theme}.css
+     *
+     * @example
+     * // Apply theme via options
+     * dialog.show({ theme: 'flat', title: 'Test' });
+     *
+     * @example
+     * // Apply theme globally
+     * Iris.defaults.theme = 'flat';
+     *
+     * @example
+     * // Apply or change theme after show
+     * dialog.applyTheme('flat');
+     *
+     * @example
+     * // Remove theme
+     * dialog.applyTheme(null);
+     */
+    applyTheme(theme) {
+        if (!this.modalElement) return;
+
+        // Remove any existing theme classes
+        const existingThemes = Array.from(this.modalElement.classList)
+            .filter(cls => cls.startsWith('iris-theme-'));
+        existingThemes.forEach(cls => this.modalElement.classList.remove(cls));
+
+        // Apply new theme
+        if (theme) {
+            this.modalElement.classList.add(`iris-theme-${theme}`);
+            this.options.theme = theme;
+        } else {
+            this.options.theme = null;
+        }
     }
 
     static alert(message, title = Iris.t('info'), options = {}) {
