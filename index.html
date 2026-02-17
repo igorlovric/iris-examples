@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Iris CSS -->
     <link rel="stylesheet" href="iris.css">
+    <link rel="stylesheet" href="themes/flat/iris-flat.css">
+    <link rel="stylesheet" href="themes/xp/iris-windows-xp.css">
 
 
 
@@ -660,6 +662,51 @@ Iris.show({
                     </div>
                 </div>
 
+
+
+                <div class="col-md-6">
+                    <div class="card example-card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-hourglass-split"></i> Themes</h5>
+                            <p class="card-text">Themes in Action<br>Switch between built-in themes to see how Iris adapts to different visual styles..</p>
+                            <label for="typeSelectTheme">Select dialog type</label>
+                            <select id="typeSelectTheme" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+                                <option value="default" selected>Default</option>
+                                <option value="primary">Primary</option>
+                                <option value="success">Success</option>
+                                <option value="info">Info</option>
+                                <option value="warning">Warning</option>
+                                <option value="danger">Danger</option>
+                                <option value="dark">Dark</option>
+                            </select>
+                            <button class="btn btn-primary btn-demo" onclick="demoTheme('')">
+                                <i class="bi bi-play-fill"></i> Default
+                            </button>
+                            <button class="btn btn-primary btn-demo" onclick="demoTheme('flat')">
+                                <i class="bi bi-play-fill"></i> Flat
+                            </button>
+                            <button class="btn btn-primary btn-demo" onclick="demoTheme('xp')">
+                                <i class="bi bi-play-fill"></i> Windows XP
+                            </button>
+                            <div class="code-block mt-3">
+<pre><code class="language-javascript">
+Iris.show({
+    title: 'Dialog',
+    message: `Dialog with theme: ${theme}`,
+    size: Iris.SIZE_NORMAL,
+    type: Iris.TYPE_PRIMARY,
+    draggable: true,
+    theme: theme,
+    buttons: [{ label: 'Ok' }]
+});
+</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
             </div>
         </div>
 
@@ -1201,6 +1248,42 @@ dialog.show({
             });
         }
 
+        function demoTheme(theme) {
+            let type=document.getElementById('typeSelectTheme').value;
+            let typeConst=null;
+            switch (type) {
+                case 'primary':
+                    typeConst=Iris.TYPE_PRIMARY;
+                    break;
+                case 'success':
+                    typeConst=Iris.TYPE_SUCCESS;
+                    break;
+                case 'info':
+                    typeConst=Iris.TYPE_INFO;
+                    break;
+                case 'warning':
+                    typeConst=Iris.TYPE_WARNING;
+                    break;
+                case 'danger':
+                    typeConst=Iris.TYPE_DANGER;
+                    break;
+                case 'dark':
+                    typeConst=Iris.TYPE_DARK;
+                    break;
+                default:
+                    typeConst=Iris.TYPE_DEFAULT;
+            }
+            Iris.show({
+                title: `Dialog ${type} / ${theme}`,
+                message: `Dialog type: <strong>${type}</strong><br>Dialog theme: <strong>${theme}</strong>`,
+                size: Iris.SIZE_NORMAL,
+                type: typeConst,
+                draggable: true,
+                minimizable: true,
+                theme: theme,
+                buttons: [{label: 'Ok'}]
+            });
+        }
 
 
         // Console info

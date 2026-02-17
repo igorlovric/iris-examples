@@ -1,0 +1,447 @@
+/*!
+ * Iris Modal Dialog Manager - Windows XP Theme
+ * https://github.com/igorlovric/iris
+ *
+ * Classic Windows XP / Luna Blue inspired theme.
+ * Gradient titlebar, 3D raised buttons, Tahoma typography.
+ * Copyright (c) 2026 Igor Lovrić - MIT License
+ *
+ * Name: Flat
+ * Version: 1.0
+ * Date: 2026-02-17
+
+ * Usage:
+
+    <link href="iris-flat.css" rel="stylesheet">
+    Iris.show({
+        title: 'Dialog title',
+        message: '<p>Dialog content</p>',
+        theme: 'flat',
+        buttons: [{
+            label: 'Ok',
+            cssClass: 'btn-primary'
+        }]
+    });
+
+ */
+
+/* =============================================================
+    Name: Flat
+    Author: Lovrić Igor
+    Version: 1.0
+    Date: 2026-02-17
+
+    Usage:
+
+    <link href="iris-flat.css" rel="stylesheet">
+
+    Iris.show({
+        title: 'Dialog title',
+        message: '<p>Dialog content</p>',
+        theme: 'flat',
+        buttons: [{
+            label: 'Ok',
+            cssClass: 'btn-primary'
+        }]
+    });
+============================================================ */
+
+/* ============================================================
+   CSS Variables
+   ============================================================ */
+:root {
+    --iris-theme-flat-radius:             4px;
+    --iris-theme-flat-radius-sm:          2px;
+
+    --iris-theme-flat-header-padding-y:   8px;
+    --iris-theme-flat-header-padding-x:   16px;
+    --iris-theme-flat-body-padding:       20px;
+    --iris-theme-flat-footer-padding-y:   10px;
+    --iris-theme-flat-footer-padding-x:   16px;
+
+    --iris-theme-flat-title-size:         13px;
+    --iris-theme-flat-title-weight:       600;
+    --iris-theme-flat-title-tracking:     0.06em;
+
+    --iris-theme-flat-shadow:             0 2px 12px rgba(0, 0, 0, 0.12),
+    0 1px 3px rgba(0, 0, 0, 0.08);
+
+    --iris-theme-flat-border-color:       #e0e0e0;
+    --iris-theme-flat-footer-bg:          #f7f7f7;
+
+    --iris-theme-flat-btn-radius:         3px;
+    --iris-theme-flat-btn-padding-y:      5px;
+    --iris-theme-flat-btn-padding-x:      14px;
+    --iris-theme-flat-btn-size:           13px;
+    --iris-theme-flat-btn-weight:         500;
+    --iris-theme-flat-btn-tracking:       0.02em;
+
+    /* Type colors */
+    --iris-theme-flat-default-bg:         #ffffff;
+    --iris-theme-flat-default-border:     #e0e0e0;
+
+    --iris-theme-flat-primary-bg:         #2563eb;
+    --iris-theme-flat-primary-border:     #1d4ed8;
+
+    --iris-theme-flat-success-bg:         #16a34a;
+    --iris-theme-flat-success-border:     #15803d;
+
+    --iris-theme-flat-info-bg:            #0891b2;
+    --iris-theme-flat-info-border:        #0e7490;
+
+    --iris-theme-flat-warning-bg:         #d97706;
+    --iris-theme-flat-warning-border:     #b45309;
+
+    --iris-theme-flat-danger-bg:          #dc2626;
+    --iris-theme-flat-danger-border:      #b91c1c;
+
+    --iris-theme-flat-dark-bg:            #1e293b;
+    --iris-theme-flat-dark-border:        #0f172a;
+}
+
+/* ============================================================
+   Modal Container
+   ============================================================ */
+.iris-theme-flat .modal-content {
+    border-radius:    var(--iris-theme-flat-radius);
+    border:           1px solid var(--iris-theme-flat-border-color);
+    box-shadow:       var(--iris-theme-flat-shadow);
+    overflow:         hidden;
+}
+
+/* ============================================================
+   Header - Base
+   ============================================================ */
+.iris-theme-flat .modal-header {
+    padding:          var(--iris-theme-flat-header-padding-y) var(--iris-theme-flat-header-padding-x);
+    border-bottom:    1px solid var(--iris-theme-flat-border-color);
+    border-radius:    0;
+    min-height:       unset;
+    align-items:      center;
+    background-color: var(--iris-theme-flat-default-bg);
+}
+
+.iris-theme-flat .modal-title {
+    font-size:        var(--iris-theme-flat-title-size);
+    font-weight:      var(--iris-theme-flat-title-weight);
+    letter-spacing:   var(--iris-theme-flat-title-tracking);
+    text-transform:   uppercase;
+    line-height:      1;
+    margin:           0;
+    color:            #374151;
+}
+
+/* ============================================================
+   Header - Types
+   ============================================================ */
+
+/* Primary */
+.iris-theme-flat .modal-header.bg-primary {
+    background-color: var(--iris-theme-flat-primary-bg) !important;
+    border-bottom-color: var(--iris-theme-flat-primary-border);
+}
+
+/* Success */
+.iris-theme-flat .modal-header.bg-success {
+    background-color: var(--iris-theme-flat-success-bg) !important;
+    border-bottom-color: var(--iris-theme-flat-success-border);
+}
+
+/* Info */
+.iris-theme-flat .modal-header.bg-info {
+    background-color: var(--iris-theme-flat-info-bg) !important;
+    border-bottom-color: var(--iris-theme-flat-info-border);
+}
+
+/* Warning */
+.iris-theme-flat .modal-header.bg-warning {
+    background-color: var(--iris-theme-flat-warning-bg) !important;
+    border-bottom-color: var(--iris-theme-flat-warning-border);
+}
+
+/* Danger */
+.iris-theme-flat .modal-header.bg-danger {
+    background-color: var(--iris-theme-flat-danger-bg) !important;
+    border-bottom-color: var(--iris-theme-flat-danger-border);
+}
+
+/* Dark */
+.iris-theme-flat .modal-header.bg-dark {
+    background-color: var(--iris-theme-flat-dark-bg) !important;
+    border-bottom-color: var(--iris-theme-flat-dark-border);
+}
+
+/* Title color on colored headers */
+.iris-theme-flat .modal-header.bg-primary .modal-title,
+.iris-theme-flat .modal-header.bg-success .modal-title,
+.iris-theme-flat .modal-header.bg-info .modal-title,
+.iris-theme-flat .modal-header.bg-warning .modal-title,
+.iris-theme-flat .modal-header.bg-danger .modal-title,
+.iris-theme-flat .modal-header.bg-dark .modal-title {
+    color: #ffffff;
+}
+
+/* ============================================================
+   Close Button
+   ============================================================ */
+.iris-theme-flat .modal-header .btn-close {
+    width:      20px;
+    height:     20px;
+    padding:    0;
+    margin:     0;
+    opacity:    0.6;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    background-size: 10px;
+}
+
+.iris-theme-flat .modal-header .btn-close:hover {
+    opacity:    1;
+    transform:  scale(1.1);
+}
+
+/* ============================================================
+   Minimize Button
+   ============================================================ */
+.iris-theme-flat .btn-minimize {
+    width:      20px;
+    height:     20px;
+    font-size:  20px;
+    line-height: 1;
+    opacity:    0.6;
+    transition: opacity 0.15s ease;
+}
+
+.iris-theme-flat .btn-minimize:hover {
+    opacity: 1;
+}
+
+/* ============================================================
+   Header Buttons Container
+   ============================================================ */
+.iris-theme-flat .modal-header-buttons {
+    gap:    6px;
+    margin-left: auto;
+}
+
+/* ============================================================
+   Body
+   ============================================================ */
+.iris-theme-flat .modal-body {
+    padding:     var(--iris-theme-flat-body-padding);
+    font-size:   14px;
+    line-height: 1.6;
+    color:       #374151;
+}
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.iris-theme-flat .modal-footer {
+    padding:          var(--iris-theme-flat-footer-padding-y) var(--iris-theme-flat-footer-padding-x);
+    background-color: var(--iris-theme-flat-footer-bg);
+    border-top:       1px solid var(--iris-theme-flat-border-color);
+    border-radius:    0;
+    gap:              6px;
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+.iris-theme-flat .modal-footer .btn {
+    border-radius:   var(--iris-theme-flat-btn-radius);
+    padding:         var(--iris-theme-flat-btn-padding-y) var(--iris-theme-flat-btn-padding-x);
+    font-size:       var(--iris-theme-flat-btn-size);
+    font-weight:     var(--iris-theme-flat-btn-weight);
+    letter-spacing:  var(--iris-theme-flat-btn-tracking);
+    text-transform:  uppercase;
+    border-width:    1px;
+    transition:      background-color 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease,
+    transform 0.1s ease;
+    box-shadow:      none !important;
+    line-height:     1.4;
+}
+
+.iris-theme-flat .modal-footer .btn:hover {
+    filter: brightness(0.92);
+}
+
+.iris-theme-flat .modal-footer .btn:active {
+    transform: translateY(1px);
+    filter:    brightness(0.85);
+}
+
+.iris-theme-flat .modal-footer .btn:disabled {
+    opacity: 0.45;
+    cursor:  not-allowed;
+}
+
+/* Button variants - iris-theme-flatten Bootstrap shadows and gradients */
+.iris-theme-flat .modal-footer .btn-primary {
+    background-color: var(--iris-theme-flat-primary-bg);
+    border-color:     var(--iris-theme-flat-primary-border);
+}
+
+.iris-theme-flat .modal-footer .btn-success {
+    background-color: var(--iris-theme-flat-success-bg);
+    border-color:     var(--iris-theme-flat-success-border);
+}
+
+.iris-theme-flat .modal-footer .btn-info {
+    background-color: var(--iris-theme-flat-info-bg);
+    border-color:     var(--iris-theme-flat-info-border);
+    color:            #ffffff;
+}
+
+.iris-theme-flat .modal-footer .btn-warning {
+    background-color: var(--iris-theme-flat-warning-bg);
+    border-color:     var(--iris-theme-flat-warning-border);
+    color:            #ffffff;
+}
+
+.iris-theme-flat .modal-footer .btn-danger {
+    background-color: var(--iris-theme-flat-danger-bg);
+    border-color:     var(--iris-theme-flat-danger-border);
+}
+
+.iris-theme-flat .modal-footer .btn-dark {
+    background-color: var(--iris-theme-flat-dark-bg);
+    border-color:     var(--iris-theme-flat-dark-border);
+}
+
+.iris-theme-flat .modal-footer .btn-secondary {
+    background-color: #6b7280;
+    border-color:     #4b5563;
+    color:            #ffffff;
+}
+
+/* Outline variants */
+.iris-theme-flat .modal-footer .btn-outline-primary {
+    border-color: var(--iris-theme-flat-primary-bg);
+    color:        var(--iris-theme-flat-primary-bg);
+}
+
+.iris-theme-flat .modal-footer .btn-outline-primary:hover {
+    background-color: var(--iris-theme-flat-primary-bg);
+    color:            #ffffff;
+    filter:           none;
+}
+
+.iris-theme-flat .modal-footer .btn-outline-secondary {
+    border-color: #6b7280;
+    color:        #6b7280;
+}
+
+.iris-theme-flat .modal-footer .btn-outline-secondary:hover {
+    background-color: #6b7280;
+    color:            #ffffff;
+    filter:           none;
+}
+
+.iris-theme-flat .modal-footer .btn-outline-danger {
+    border-color: var(--iris-theme-flat-danger-bg);
+    color:        var(--iris-theme-flat-danger-bg);
+}
+
+.iris-theme-flat .modal-footer .btn-outline-danger:hover {
+    background-color: var(--iris-theme-flat-danger-bg);
+    color:            #ffffff;
+    filter:           none;
+}
+
+/* ============================================================
+   Button Spinner
+   ============================================================ */
+.iris-theme-flat .modal-footer .btn .spinner-border-sm {
+    width:        0.75rem;
+    height:       0.75rem;
+    border-width: 0.15em;
+}
+
+/* ============================================================
+   Scrollable Body
+   ============================================================ */
+.iris-theme-flat .modal-dialog-scrollable .modal-body {
+    scrollbar-width:  thin;
+    scrollbar-color:  #d1d5db #f3f4f6;
+}
+
+.iris-theme-flat .modal-dialog-scrollable .modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.iris-theme-flat .modal-dialog-scrollable .modal-body::-webkit-scrollbar-track {
+    background: #f3f4f6;
+}
+
+.iris-theme-flat .modal-dialog-scrollable .modal-body::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius:    3px;
+}
+
+.iris-theme-flat .modal-dialog-scrollable .modal-body::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+}
+
+/* ============================================================
+   Taskbar
+   ============================================================ */
+.iris-theme-flat ~ #irisTaskbar #irisTaskbarButton,
+body.iris-theme-flat-taskbar #irisTaskbarButton {
+    border-radius: var(--iris-theme-flat-radius);
+    box-shadow:    0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.iris-theme-flat ~ #irisTaskbar .iris-taskbar-list,
+body.iris-theme-flat-taskbar .iris-taskbar-list {
+    border-radius: var(--iris-theme-flat-radius);
+    border:        1px solid var(--iris-theme-flat-border-color);
+    box-shadow:    var(--iris-theme-flat-shadow);
+}
+
+.iris-theme-flat ~ #irisTaskbar .iris-taskbar-item,
+body.iris-theme-flat-taskbar .iris-taskbar-item {
+    border-radius: var(--iris-theme-flat-radius-sm);
+    font-size:     13px;
+}
+
+/* ============================================================
+   Backdrop
+   ============================================================ */
+.iris-theme-flat-backdrop.modal-backdrop {
+    background-color: rgba(15, 23, 42, 0.5);
+}
+
+/* ============================================================
+   Animations - Subtle
+   ============================================================ */
+.iris-theme-flat .modal.fade .modal-dialog {
+    transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+    transform:  translateY(-6px);
+    opacity:    0;
+}
+
+.iris-theme-flat .modal.show .modal-dialog {
+    transform: translateY(0);
+    opacity:   1;
+}
+
+/* ============================================================
+   Fullscreen override
+   ============================================================ */
+.iris-theme-flat .modal-fullscreen .modal-content {
+    border-radius: 0;
+    border:        none;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 576px) {
+    :root {
+        --iris-theme-flat-body-padding:       16px;
+        --iris-theme-flat-header-padding-x:   12px;
+        --iris-theme-flat-footer-padding-x:   12px;
+    }
+}
