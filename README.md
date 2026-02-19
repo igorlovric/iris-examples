@@ -19,7 +19,7 @@ Check out our comprehensive examples covering:
 
 **[Explore all examples →](https://igorlovric.github.io/iris-examples)**
 or
-**[Go to Iris GitHub →](https://igorlovric.github.io/iris)**
+**[Go to Iris GitHub →](https://github.com/igorlovric/iris)**
 
 ## License
 
