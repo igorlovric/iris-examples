@@ -7,8 +7,8 @@
  * Copyright (c) 2026 Igor Lovrić - MIT License
  *
  * Name: Flat
- * Version: 1.0
- * Date: 2026-02-17
+ * Version: 1.1
+ * Date: 2026-02-19
 
  * Usage:
 
@@ -389,7 +389,7 @@
    ============================================================ */
 .iris-theme-flat ~ #irisTaskbar #irisTaskbarButton,
 body.iris-theme-flat-taskbar #irisTaskbarButton {
-    border-radius: var(--iris-theme-flat-radius);
+    border-radius: 50% !important;
     box-shadow:    0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
