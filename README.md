@@ -18,6 +18,8 @@ Check out our comprehensive examples covering:
 🌐 Internationalization
 
 **[Explore all examples →](https://igorlovric.github.io/iris-examples)**
+or
+**[Go to Iris GitHub →](https://igorlovric.github.io/iris)**
 
 ## License
 
